@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>As 7 Couraças</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --pink:#C94F78;--pink-light:#FBE9EF;--pink-dark:#8F3054;--pink-deep:#3D1020;
+  --cream:#FAF7F3;--white:#fff;--text:#1C1015;--muted:#7A6470;--subtle:#C4B0B8;
+  --border:rgba(201,79,120,0.13);
+}
+html{scroll-behavior:smooth}
+body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--text);min-height:100vh;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+
+/* SPLASH */
+#splash{min-height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:3rem 1.5rem;background:var(--pink-deep);position:relative;overflow:hidden}
+#splash::before{content:'';position:absolute;top:-100px;right:-100px;width:350px;height:350px;border-radius:50%;background:rgba(201,79,120,.1);pointer-events:none}
+#splash::after{content:'';position:absolute;bottom:-80px;left:-80px;width:260px;height:260px;border-radius:50%;background:rgba(201,79,120,.07);pointer-events:none}
+.splash-inner{position:relative;z-index:1;animation:fadeUp .9s ease both}
+.s-eye{font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:rgba(255,255,255,.3);margin-bottom:1.5rem}
+.s-title{font-family:'Cormorant Garamond',serif;font-size:clamp(56px,15vw,88px);font-weight:300;line-height:1;color:#fff;margin-bottom:.25rem}
+.s-title em{font-style:italic;color:rgba(201,79,120,.85)}
+.s-sub{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:clamp(16px,4vw,20px);color:rgba(255,255,255,.38);line-height:1.65;max-width:360px;margin:1.5rem auto 2.5rem}
+.s-track{display:flex;justify-content:center;gap:10px;margin-bottom:2.5rem}
+.s-pip{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.15)}
+.btn-enter{background:var(--pink);color:#fff;border:none;border-radius:100px;padding:15px 48px;font-size:15px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;letter-spacing:.02em;transition:background .2s,transform .15s}
+.btn-enter:hover{background:#a83d63;transform:translateY(-1px)}
+.s-note{font-size:11.5px;color:rgba(255,255,255,.2);margin-top:1rem}
+
+/* APP */
+#app{display:none;min-height:100vh}
+.topbar{position:sticky;top:0;z-index:10;background:rgba(250,247,243,.94);backdrop-filter:blur(10px);border-bottom:1px solid var(--border);padding:.75rem 1.25rem;display:flex;align-items:center;justify-content:space-between}
+.tb-pips{display:flex;gap:5px}
+.tb-pip{width:26px;height:26px;border-radius:50%;border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:10.5px;color:var(--subtle);font-weight:500;transition:all .3s;background:var(--white)}
+.tb-pip.active{background:var(--pink);border-color:var(--pink);color:#fff}
+.tb-pip.done{background:var(--pink-light);border-color:rgba(201,79,120,.4);color:var(--pink)}
+.tb-label{font-size:10.5px;color:var(--subtle);letter-spacing:.07em;text-transform:uppercase;max-width:160px;text-align:right;line-height:1.4}
+
+/* SCREEN */
+.screen{display:none;min-height:calc(100vh - 53px);flex-direction:column;justify-content:center;padding:2.5rem 1.5rem 6rem;max-width:520px;margin:0 auto}
+.screen.show{display:flex;animation:fadeUp .45s ease both}
+
+/* COVER */
+.scr-cover .c-day{font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--pink);margin-bottom:1.25rem;opacity:.8}
+.scr-cover .c-title{font-family:'Cormorant Garamond',serif;font-size:clamp(38px,10vw,58px);font-weight:300;line-height:1.08;color:var(--text);margin-bottom:1.25rem}
+.scr-cover .c-title em{font-style:italic;color:var(--pink-dark)}
+.scr-cover .c-hook{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:clamp(17px,4vw,21px);color:var(--muted);line-height:1.65;margin-bottom:1.5rem}
+.scr-cover .c-breathe{font-size:12px;color:var(--subtle);letter-spacing:.07em;padding:.75rem 1rem;background:var(--pink-light);border-radius:10px;display:inline-block}
+
+/* REVEAL — palavra a palavra emocional */
+.scr-reveal{gap:0}
+.scr-reveal .rv-blocks{display:flex;flex-direction:column;gap:1.25rem}
+.rv-block{opacity:0;transform:translateY(10px);transition:opacity .5s ease,transform .5s ease}
+.rv-block.on{opacity:1;transform:translateY(0)}
+.rv-block .rb-text{font-family:'Cormorant Garamond',serif;font-size:clamp(19px,4.5vw,24px);font-weight:400;line-height:1.5;color:var(--text)}
+.rv-block .rb-text em{font-style:italic;color:var(--pink-dark)}
+.rv-block .rb-text strong{font-weight:500;color:var(--pink-deep)}
+.rv-block.accent .rb-text{font-size:clamp(22px,5.5vw,30px);color:var(--pink-dark)}
+
+/* MIRROR */
+.scr-mirror .m-intro{font-size:14px;color:var(--muted);line-height:1.7;margin-bottom:1.5rem;font-style:italic;font-family:'Cormorant Garamond',serif;font-size:16px}
+.scr-mirror .m-list{display:flex;flex-direction:column;gap:10px}
+.m-item{padding:14px 16px;background:var(--white);border-radius:14px;border:1px solid var(--border);font-size:14.5px;color:var(--text);line-height:1.55;display:flex;gap:10px;align-items:flex-start;opacity:0;transform:translateY(8px);transition:opacity .45s ease,transform .45s ease}
+.m-item.on{opacity:1;transform:translateY(0)}
+.m-item::before{content:'·';color:var(--pink);font-size:22px;line-height:.85;flex-shrink:0}
+
+/* SABOTADOR */
+.scr-sab{text-align:center}
+.sab-card{background:var(--pink-deep);border-radius:24px;padding:2.25rem 1.75rem;position:relative;overflow:hidden;margin-bottom:1.5rem}
+.sab-card::before{content:'';position:absolute;top:-50px;right:-50px;width:180px;height:180px;border-radius:50%;background:rgba(201,79,120,.13)}
+.sab-eye{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.28);margin-bottom:.75rem}
+.sab-name{font-family:'Cormorant Garamond',serif;font-size:clamp(28px,7vw,40px);font-style:italic;font-weight:300;color:#fff;margin-bottom:1.25rem;position:relative;z-index:1}
+.sab-desc{font-size:14px;color:rgba(255,255,255,.58);line-height:1.85;position:relative;z-index:1;text-align:left}
+.sab-desc strong{color:rgba(255,255,255,.85);font-weight:500}
+
+/* PERGUNTA */
+.scr-q{text-align:center;gap:1.5rem}
+.q-pre{font-size:14px;color:var(--muted);line-height:1.7;font-style:italic;font-family:'Cormorant Garamond',serif;font-size:16px}
+.q-box{background:var(--pink-light);border-radius:20px;padding:1.75rem 1.5rem;border-left:3px solid var(--pink);text-align:left}
+.q-text{font-family:'Cormorant Garamond',serif;font-size:clamp(18px,4.5vw,23px);font-style:italic;font-weight:400;color:var(--pink-deep);line-height:1.65}
+.q-note{font-size:12px;color:var(--subtle);font-style:italic;margin-top:1rem}
+.breath-wrap{display:flex;flex-direction:column;align-items:center;gap:.75rem}
+.breath-label{font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--subtle)}
+.breath-anim{width:60px;height:60px;border-radius:50%;border:1.5px solid rgba(201,79,120,.25);display:flex;align-items:center;justify-content:center;animation:breathe 5s ease-in-out infinite}
+.breath-anim span{width:26px;height:26px;border-radius:50%;background:rgba(201,79,120,.2);animation:breathe-inner 5s ease-in-out infinite}
+@keyframes breathe{0%,100%{transform:scale(1);border-color:rgba(201,79,120,.2)}50%{transform:scale(1.2);border-color:rgba(201,79,120,.5)}}
+@keyframes breathe-inner{0%,100%{transform:scale(1);opacity:.4}50%{transform:scale(1.15);opacity:1}}
+
+/* VERDADE — tela de impacto emocional */
+.scr-verdade{text-align:center;justify-content:center;gap:1.5rem}
+.v-card{background:var(--white);border-radius:24px;border:1px solid var(--border);padding:2rem 1.75rem}
+.v-label{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--pink);margin-bottom:1.25rem;opacity:.8}
+.v-text{font-family:'Cormorant Garamond',serif;font-size:clamp(20px,5vw,27px);font-style:italic;font-weight:300;color:var(--text);line-height:1.55}
+.v-text em{color:var(--pink-dark);font-style:italic}
+.v-sub{font-size:13.5px;color:var(--muted);line-height:1.75;margin-top:1rem}
+
+/* PRATICA */
+.scr-pratica .p-intro{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:clamp(16px,3.8vw,19px);color:var(--muted);line-height:1.7;margin-bottom:1.5rem}
+.p-steps{display:flex;flex-direction:column;gap:10px}
+.p-step{display:flex;gap:14px;align-items:flex-start;padding:14px 16px;background:var(--white);border-radius:14px;border:1px solid var(--border);opacity:0;transform:translateX(-8px);transition:opacity .4s,transform .4s}
+.p-step.on{opacity:1;transform:translateX(0)}
+.p-step .pn{width:24px;height:24px;border-radius:50%;background:var(--pink-light);color:var(--pink);font-size:11px;font-weight:500;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.p-step .pt{font-size:14px;color:var(--text);line-height:1.65}
+.p-step .pt em{color:var(--pink-dark);font-style:italic}
+
+/* ESCOLHA — tela de bifurcação */
+.scr-escolha{gap:1.25rem}
+.esc-intro{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:clamp(17px,4vw,21px);color:var(--muted);line-height:1.65}
+.esc-grid{display:flex;flex-direction:column;gap:10px}
+.esc-card{padding:16px 18px;border-radius:16px;font-size:14.5px;line-height:1.65;display:flex;gap:12px;align-items:flex-start}
+.esc-card.a{background:var(--pink-light);border:1px solid rgba(201,79,120,.2);color:var(--pink-deep)}
+.esc-card.b{background:var(--white);border:1px solid var(--border);color:var(--muted)}
+.esc-card::before{content:'→';color:var(--pink);flex-shrink:0;margin-top:1px}
+.esc-closing{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:clamp(15px,3.5vw,18px);color:var(--muted);line-height:1.7;border-top:1px solid var(--border);padding-top:1.25rem}
+
+/* AFIRMACAO */
+.scr-afirm{text-align:center;gap:1.25rem}
+.af-label{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--pink);opacity:.8}
+.af-card{background:var(--pink-deep);border-radius:24px;padding:2.5rem 2rem;position:relative;overflow:hidden}
+.af-card::after{content:'';position:absolute;bottom:-50px;right:-50px;width:180px;height:180px;border-radius:50%;background:rgba(201,79,120,.12)}
+.af-text{font-family:'Cormorant Garamond',serif;font-size:clamp(20px,5vw,26px);font-style:italic;font-weight:300;color:#fff;line-height:1.55;position:relative;z-index:1}
+.af-sub{font-size:13px;color:var(--muted);line-height:1.65;font-style:italic;font-family:'Cormorant Garamond',serif;font-size:15px}
+
+/* COMPLETE */
+.scr-complete{text-align:center;gap:1rem}
+.cp-icon{font-size:48px}
+.cp-badge{display:inline-block;background:var(--pink-light);color:var(--pink-dark);font-size:10px;letter-spacing:.15em;text-transform:uppercase;padding:5px 16px;border-radius:100px;font-weight:500}
+.cp-title{font-family:'Cormorant Garamond',serif;font-size:clamp(22px,5vw,30px);font-weight:400;color:var(--text);line-height:1.3}
+.cp-text{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:clamp(15px,3.5vw,18px);color:var(--muted);line-height:1.75;max-width:400px;margin:0 auto}
+
+/* BOTTOM NAV */
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:rgba(250,247,243,.96);backdrop-filter:blur(10px);border-top:1px solid var(--border);padding:.9rem 1.5rem;display:flex;justify-content:space-between;align-items:center;z-index:20}
+.btn-bk{background:none;border:1px solid var(--border);border-radius:100px;padding:9px 20px;font-size:13px;color:var(--muted);cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s}
+.btn-bk:hover{border-color:var(--pink);color:var(--text)}
+.btn-bk:disabled{opacity:.22;cursor:default}
+.btn-fw{background:var(--pink);color:#fff;border:none;border-radius:100px;padding:10px 28px;font-size:14px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;transition:background .2s,transform .15s}
+.btn-fw:hover{background:var(--pink-dark);transform:translateY(-1px)}
+.nav-frac{font-size:11px;color:var(--subtle);letter-spacing:.05em}
+
+/* FINAL */
+#final{display:none;min-height:100vh;background:var(--pink-deep);padding:4rem 1.5rem 5rem;position:relative;overflow:hidden}
+#final::before{content:'';position:absolute;top:-120px;right:-120px;width:400px;height:400px;border-radius:50%;background:rgba(201,79,120,.1);pointer-events:none}
+.final-wrap{max-width:500px;margin:0 auto;text-align:center;position:relative;z-index:1;animation:fadeUp .9s ease both}
+.f-icon{font-size:52px;margin-bottom:1.5rem}
+.f-title{font-family:'Cormorant Garamond',serif;font-size:clamp(36px,10vw,58px);font-weight:300;color:#fff;line-height:1.08;margin-bottom:1.25rem}
+.f-title em{font-style:italic;color:rgba(201,79,120,.85)}
+.f-sub{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:clamp(16px,4vw,19px);color:rgba(255,255,255,.42);line-height:1.7;margin-bottom:2.5rem}
+.f-choices{display:flex;flex-direction:column;gap:10px;margin-bottom:2rem;text-align:left}
+.f-choice{padding:15px 18px;border-radius:14px;font-size:14.5px;line-height:1.65;display:flex;gap:12px;align-items:flex-start}
+.f-choice.lit{background:rgba(201,79,120,.18);color:rgba(255,255,255,.85)}
+.f-choice.dim{background:rgba(255,255,255,.05);color:rgba(255,255,255,.5)}
+.f-choice::before{content:'→';color:var(--pink);flex-shrink:0;margin-top:2px}
+.f-closing{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:clamp(15px,3.8vw,18px);color:rgba(255,255,255,.25);line-height:1.7;border-top:1px solid rgba(255,255,255,.08);padding-top:1.75rem}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:400px){.screen{padding:2rem 1.25rem 6rem}}
+</style>
+</head>
+<body>
+
+<div id="splash">
+  <div class="splash-inner">
+    <div class="s-eye">Bônus exclusivo · Travessia guiada</div>
+    <div class="s-title">As 7<br><em>Couraças</em></div>
+    <div class="s-sub">Sete dias. Sete camadas. Uma mulher do outro lado que consegue escolher.</div>
+    <div class="s-track"><div class="s-pip"></div><div class="s-pip"></div><div class="s-pip"></div><div class="s-pip"></div><div class="s-pip"></div><div class="s-pip"></div><div class="s-pip"></div></div>
+    <button class="btn-enter" onclick="startApp()">Começar minha travessia →</button>
+    <div class="s-note">Sem escrita. Sem tarefas. Só sentir.</div>
+  </div>
+</div>
+
+<div id="app">
+  <div class="topbar">
+    <div class="tb-pips" id="tb-pips"></div>
+    <div class="tb-label" id="tb-label"></div>
+  </div>
+  <div id="screens-wrap"></div>
+  <div class="bottom-nav">
+    <button class="btn-bk" id="btn-bk" onclick="goBack()">← Voltar</button>
+    <div class="nav-frac" id="nav-frac"></div>
+    <button class="btn-fw" id="btn-fw" onclick="goForward()">Continuar →</button>
+  </div>
+</div>
+
+<div id="final">
+  <div class="final-wrap">
+    <div class="f-icon">✦</div>
+    <div class="f-title">Você atravessou<br><em>as 7 couraças.</em></div>
+    <div class="f-sub">Você não desviou o olhar de nenhuma delas. Isso já é outro lugar — e outro nível de presença.</div>
+    <div class="f-choices">
+      <div class="f-choice lit">Agora, se você quiser se conectar com alguém, será por escolha — não por medo de ficar sozinha.</div>
+      <div class="f-choice lit">Se quiser ficar sozinha, será por escolha — não porque uma couraça fechou a porta antes que você decidisse.</div>
+      <div class="f-choice dim">A mulher emocionalmente livre não é a que nunca sofreu. É a que aprendeu que amor não precisa ser ameaça.</div>
+    </div>
+    <div class="f-closing">"Quando as couraças caem, o que sobra não é vulnerabilidade.<br>É presença. É desejo. É a vida inteira disponível para ser sentida."</div>
+  </div>
+</div>
+
+<script>
+const days = [
+  // DIA 1 — ANTECIPAÇÃO
+  {label:"Antecipação", screens:[
+    {type:"cover", day:"Dia 1", title:"A Couraça da\n<em>Antecipação</em>", hook:"Você aprendeu a sofrer antes de sofrer.", breathe:"Respire. Você está em segurança agora."},
+    {type:"reveal", blocks:[
+      {text:"Existe uma dor muito específica\nque poucas pessoas conseguem nomear.", accent:false},
+      {text:"A dor de se machucar\n<em>antes de ser machucada.</em>", accent:false},
+      {text:"De antecipar o abandono.\nDe se preparar para o fim\nainda no começo.", accent:false},
+      {text:"De se afastar\n<strong>não porque algo aconteceu —\nmas porque na sua cabeça,\njá aconteceu mil vezes.</strong>", accent:false},
+      {text:"Essa é a couraça da antecipação.\nE ela cobra um preço alto.", accent:true}
+    ]},
+    {type:"mirror", intro:"Talvez você reconheça isso:", items:[
+      "Quando algo vai bem, você espera a coisa que vai estragar",
+      "Você se prepara para a dor como se ela fosse inevitável",
+      "Você já imaginou o fim de uma relação antes que ela realmente começasse",
+      "Você recua emocionalmente — não porque a pessoa fez algo, mas porque no seu interior, ela já fez"
+    ]},
+    {type:"sabotador", nome:"O Hipervigilante", desc:"Ele não quer te machucar. <strong>Ele quer te proteger.</strong> Mas ao viver em estado de alerta constante — monitorando sinais, interpretando silêncios, esperando a decepção — ele te rouba o único lugar onde amor existe: o presente. E sem presença, não há conexão possível."},
+    {type:"verdade", label:"O que essa couraça esconde", text:"Você não tem medo de ser abandonada.\nVocê tem medo de <em>acreditar</em> —\ne se decepcionar de novo.", sub:"A antecipação é a forma que sua mente encontrou de nunca mais ser pega de surpresa pela dor. Mas ela também te impede de ser pega de surpresa pela alegria."},
+    {type:"pergunta", pre:"Fique com essa pergunta. Sem pressa.", question:"Em que momento você começou a se afastar de alguém\nantes que essa pessoa fizesse algo de fato?\nO que você antecipou que ainda não tinha acontecido?", note:"Só sinta. Não precisa resolver."},
+    {type:"pratica", intro:"Uma prática simples. Menos de 3 minutos.", steps:[
+      "Feche os olhos por um instante.",
+      "Pergunte a si mesma: o que estou sentindo <em>agora</em> é real — ou é memória disfarçada de presente?",
+      "Identifique uma coisa concreta que está acontecendo agora. Não o que pode acontecer.",
+      "Respire e repita por dentro: eu estou aqui. Agora. E agora está bem."
+    ]},
+    {type:"afirmacao", text:"Eu não preciso me proteger\nde algo que ainda não aconteceu.\nPosso estar presente — e sentir —\nsem antecipar a perda.", sub:"Leve essa frase com você hoje."},
+    {type:"complete", icon:"🌸", badge:"Dia 1 concluído", title:"Couraça da Antecipação — atravessada.", text:"Segurança não vem de controlar o futuro. Vem de confiar em você no presente."}
+  ]},
+
+  // DIA 2 — VIGILÂNCIA
+  {label:"Vigilância", screens:[
+    {type:"cover", day:"Dia 2", title:"A Couraça da\n<em>Vigilância</em>", hook:"Quando amor vira monitoramento.", breathe:"Respire. Hoje você pode pousar."},
+    {type:"reveal", blocks:[
+      {text:"Você ama.\nMas não descansa.", accent:false},
+      {text:"Dentro de uma relação,\nsua mente não para.", accent:false},
+      {text:"Você analisa cada mensagem.\nInterpreta cada silêncio.\nTraduz cada tom de voz.", accent:false},
+      {text:"<strong>Não porque a outra pessoa\nfez algo errado.</strong>\nMas porque uma parte de você\naprendeu que relaxar é perigoso.", accent:false},
+      {text:"O amor que você vive é real.\nMas o custo de sustentá-lo\né alto demais.", accent:true}
+    ]},
+    {type:"mirror", intro:"Isso ressoa em você?", items:[
+      "Você analisa cada mensagem procurando um sinal",
+      "Mudanças de humor na outra pessoa te desestabilizam completamente",
+      "Você não consegue relaxar dentro da relação — sempre esperando algo",
+      "Amor, pra você, não traz paz primeiro. Traz alerta primeiro."
+    ]},
+    {type:"sabotador", nome:"O Controlador", desc:"Ele acredita que se você monitorar tudo, vai conseguir evitar a dor. Que informação é proteção. Mas <strong>amor real não cabe dentro de controle</strong> — e quanto mais você tenta controlar, mais o outro recua, e mais você sente que precisa controlar ainda mais. É um ciclo que não tem saída pelo mesmo caminho que entrou."},
+    {type:"verdade", label:"O que essa couraça esconde", text:"Você não é controladora.\nVocê é alguém que<em> aprendeu que confiar dói.</em>", sub:"E então criou um sistema para nunca precisar confiar. O problema é que esse sistema também nunca te deixa descansar dentro de uma relação."},
+    {type:"pergunta", pre:"Fique aqui um instante.", question:"O que você monitora numa relação?\nO que acontece dentro de você\nquando não tem acesso a essa informação?", note:"Deixa a pergunta pousar. Não precisa de resposta agora."},
+    {type:"pratica", intro:"Uma experiência de soltar — por alguns minutos.", steps:[
+      "Pense em alguém que você monitora — mesmo que sutilmente.",
+      "Por 5 minutos, não checa nada relacionado a essa pessoa.",
+      "Quando a vontade de checar vier — apenas observe. Nomeie: <em>'estou com medo de quê, exatamente?'</em>",
+      "Não precisa resolver. Só sentir o que está por baixo da vontade de controlar."
+    ]},
+    {type:"afirmacao", text:"Eu não preciso saber tudo\npara estar segura.\nPosso confiar —\nnão porque a outra pessoa é perfeita,\nmas porque eu consigo lidar\ncom o que vier.", sub:"Uma vez por dia, essa frase."},
+    {type:"complete", icon:"🌿", badge:"Dia 2 concluído", title:"Couraça da Vigilância — atravessada.", text:"Confiança não é ingenuidade. É a decisão de estar presente sem precisar controlar cada detalhe do que pode acontecer."}
+  ]},
+
+  // DIA 3 — DISTÂNCIA
+  {label:"Distância", screens:[
+    {type:"cover", day:"Dia 3", title:"A Couraça da\n<em>Distância</em>", hook:"Você está — mas não de verdade.", breathe:"Respire. Hoje você pode chegar um pouco mais perto."},
+    {type:"reveal", blocks:[
+      {text:"Seu corpo está presente.\nMas você construiu uma sala\ndentro de si mesma\nondem ninguém entra.", accent:false},
+      {text:"Você participa.\nResponde. Aparece.", accent:false},
+      {text:"Mas uma parte sua fica de fora.\nSempre.", accent:false},
+      {text:"<strong>Não é frieza.\nNão é falta de sentimento.</strong>\nÉ proteção.", accent:false},
+      {text:"Você aprendeu que\nse der menos, perde menos.\nMas essa matemática\ntambém te impede de receber de verdade.", accent:true}
+    ]},
+    {type:"mirror", intro:"Isso é familiar?", items:[
+      "Você está presente — mas guarda uma parte de si que ninguém acessa",
+      "Conversas ficam na superfície, mesmo quando você queria ir mais fundo",
+      "Intimidade real te desconforta, mesmo sendo o que você mais quer",
+      "Você sabe dar atenção. Mas ser realmente conhecida — isso parece arriscado emocionalmente"
+    ]},
+    {type:"sabotador", nome:"O Esquivo", desc:"Ele não foge da relação — fica na superfície dela. Quando a conversa começa a ficar profunda demais, ele muda de assunto. Quando a intimidade cresce, ele cria distância. <strong>Ele é silencioso. Raramente é percebido.</strong> Mas está sempre administrando o quanto de você é exposto — e o quanto de amor você consegue receber."},
+    {type:"verdade", label:"O que essa couraça esconde", text:"Você não tem medo de intimidade.\nVocê tem medo de\n<em>ser conhecida — e ainda assim ser rejeitada.</em>", sub:"Então você controla o quanto de si entrega. E chama isso de independência. Mas no fundo, é só a distância que te mantém segura."},
+    {type:"verdade", label:"Uma pergunta diferente", text:"Quando foi a última vez que você sentiu\n<em>vontade de ser vista?</em>", sub:"Não para impressionar. Não para ser amada. Só para existir de verdade na presença de alguém. Essa vontade ainda existe em você — mesmo que pequena, mesmo que enterrada. Ela não morreu. Está esperando condições de aparecer."},
+    {type:"pergunta", pre:"Fique com essa.", question:"O que você nunca disse para ninguém com quem se relacionou?\nNão porque não havia espaço —\nmas porque você não se permitiu.", note:"Não precisa dizer a ninguém. Só você saber já é um passo."},
+    {type:"pratica", intro:"Uma prática de aproximação.", steps:[
+      "Pense em alguém próximo de você.",
+      "Identifique uma coisa verdadeira sobre você que essa pessoa não sabe.",
+      "Não precisa dizer hoje. Só sinta o que é ter esse pensamento <em>sem a couraça na frente.</em>",
+      "Pergunte internamente: o que eu ganho guardando isso? O que eu perderia se alguém soubesse?"
+    ]},
+    {type:"afirmacao", text:"Ser vista não é perigo.\nÉ o caminho de volta\npara a conexão\nque eu mais quero.", sub:"Leve isso hoje."},
+    {type:"complete", icon:"🕊️", badge:"Dia 3 concluído", title:"Couraça da Distância — atravessada.", text:"Intimidade não é ausência de privacidade. É a coragem de ser conhecida — e de ainda assim ficar."}
+  ]},
+
+  // DIA 4 — ESTRANHAMENTO
+  {label:"Estranhamento", screens:[
+    {type:"cover", day:"Dia 4", title:"A Couraça do\n<em>Estranhamento</em>", hook:"Quando amor genuíno parece estranho demais.", breathe:"Respire. Hoje é sobre receber."},
+    {type:"reveal", blocks:[
+      {text:"Alguém te ama de verdade.\nEle está disponível.\nEle fica.", accent:false},
+      {text:"E algo dentro de você\nnão sabe o que fazer com isso.", accent:false},
+      {text:"Cuidado genuíno te deixa desconfortável.\nAtenção constante parece sufocante.\nPresença real parece suspeita.", accent:false},
+      {text:"<strong>Não porque você não quer amor.\nMas porque você desaprendeu\ncomo receber.</strong>", accent:false},
+      {text:"E então você perde o interesse\npor quem está disponível —\ne se atrai por quem não está.", accent:true}
+    ]},
+    {type:"mirror", intro:"Você se reconhece aqui?", items:[
+      "Quando alguém te trata bem de verdade, você fica desconfiante",
+      "Você perde o interesse exatamente quando ele fica de verdade",
+      "Você sabe dar. Mas receber amor constante te deixa sem saber o que fazer",
+      "Você se atrai por quem é difícil — e estranha quem é simples e presente"
+    ]},
+    {type:"sabotador", nome:"O Desconfiante", desc:"Ele não acredita que amor gratuito exista. Quando alguém cuida, ele pergunta: <strong>o que ela quer em troca?</strong> Quando alguém fica, ele espera a saída. Ele foi criado em relações onde amor tinha condições — e agora enxerga condições onde elas não existem. Ele confunde segurança com armadilha. E disponibilidade com fraqueza."},
+    {type:"verdade", label:"O que essa couraça esconde", text:"Você não perdeu o interesse\nporque ele não era bom o suficiente.\nVocê fugiu porque ele era\n<em>bom demais para ser seguro.</em>", sub:"Quando alguém está disponível de verdade, sua couraça não sabe o que fazer com isso. Então ela cria distância — e chama de falta de atração."},
+    {type:"pergunta", pre:"Sente essa antes de responder.", question:"Pense em alguém que já te amou\ncom cuidado e constância.\nO que você sentiu?\nO que te impedia de acreditar\nque aquilo era real?", note:"Não precisa ter resposta certa."},
+    {type:"pratica", intro:"Uma prática de receber — sem desviar.", steps:[
+      "Hoje, quando alguém fizer algo gentil por você — não minimize. Não devolva imediatamente.",
+      "Apenas diga obrigada. E fique com esse momento por alguns segundos.",
+      "Observe o desconforto, se vier. Não o resolva. Só respire.",
+      "Pergunte: <em>por que receber parece mais difícil que dar?</em>"
+    ]},
+    {type:"afirmacao", text:"Eu mereço receber\no amor que sei dar.\nReceber não é fraqueza —\né metade da conexão.", sub:"Uma vez por dia."},
+    {type:"complete", icon:"🌙", badge:"Dia 4 concluído", title:"Couraça do Estranhamento — atravessada.", text:"Você não precisa ganhar o amor que já existe pra você. Ele pode simplesmente ser — e você pode simplesmente receber."}
+  ]},
+
+  // DIA 5 — CONTROLE
+  {label:"Controle", screens:[
+    {type:"cover", day:"Dia 5", title:"A Couraça do\n<em>Controle</em>", hook:"Você gerencia o vínculo para não ser surpreendida.", breathe:"Respire. Hoje é sobre soltar."},
+    {type:"reveal", blocks:[
+      {text:"Você não se perde na relação.\nMas também não mergulha de verdade nela.", accent:false},
+      {text:"Você mantém o ritmo.\nDita o tom.\nDecide a intensidade.", accent:false},
+      {text:"Não por dominância.\n<em>Por sobrevivência emocional.</em>", accent:false},
+      {text:"Porque perder o controle de uma relação\nSignifica se expor ao imprevisível.\n<strong>E o imprevisível já te machucou antes.</strong>", accent:false},
+      {text:"Então você administra.\nE chama isso de independência.", accent:true}
+    ]},
+    {type:"mirror", intro:"Isso ressoa em você?", items:[
+      "Você mantém o ritmo e dita o tom das relações que vive",
+      "Quando perde o controle de uma situação afetiva, fica muito desconfortável",
+      "Entregar-se de verdade — sem gerenciar — parece arriscado emocionalmente",
+      "Você chama de independência o que às vezes é distância emocional calculada"
+    ]},
+    {type:"sabotador", nome:"O Gerente", desc:"Ele organiza as relações como projetos. Define ritmo, avalia progresso, estabelece limites defensivos. Ele é competente. Parece seguro. Mas no fundo tem medo de que se baixar a guarda, <strong>vai se dissolver dentro do outro.</strong> E isso, pra ele, é o pior cenário possível. Então ele gerencia. Sempre. E nunca realmente entrega."},
+    {type:"verdade", label:"O que essa couraça esconde", text:"Você não quer controlar.\nVocê quer <em>não sofrer de surpresa.</em>", sub:"O controle é a ilusão de que se você administrar bem o suficiente, nada vai te machucar. Mas amor real não tem administrador. Ele só existe quando alguém decide soltar."},
+    {type:"pergunta", pre:"Fique com essa por um tempo.", question:"O que você temia que acontecesse\nse você se entregasse de verdade —\nsem gerenciar?\nQual é o pior cenário\nquando você pensa em\n'perder o controle' dentro de um amor?", note:"Deixa o medo aparecer. Você não precisa resolvê-lo agora."},
+    {type:"pratica", intro:"Um momento sem roteiro.", steps:[
+      "Escolha uma conversa hoje onde você vai deixar o outro liderar o tom.",
+      "Não prepare o que vai dizer. Não administre a direção.",
+      "Apenas responda ao que vier — genuinamente, sem editar.",
+      "Depois observe: <em>você se perdeu — ou só ficou mais presente?</em>"
+    ]},
+    {type:"afirmacao", text:"Eu posso me entregar\nsem me perder.\nVulnerabilidade não é ausência de mim —\né a forma mais verdadeira de mim.", sub:"Leve isso hoje."},
+    {type:"complete", icon:"🔓", badge:"Dia 5 concluído", title:"Couraça do Controle — atravessada.", text:"Soltar o controle não é ser fraca. É confiar que você existe mesmo quando para de gerenciar tudo."}
+  ]},
+
+  // DIA 6 — AUTOABANDONO
+  {label:"Autoabandono", screens:[
+    {type:"cover", day:"Dia 6", title:"A Couraça do\n<em>Autoabandono</em>", hook:"Você some dentro da relação para não ocupar espaço demais.", breathe:"Respire. Hoje você pode ocupar espaço."},
+    {type:"reveal", blocks:[
+      {text:"Você entra num relacionamento\ne começa a se tornar menor.", accent:false},
+      {text:"Adapta seus gostos.\nDiminui suas opiniões.\nMolda suas necessidades\nao que o outro parece querer.", accent:false},
+      {text:"<strong>Não por fraqueza.</strong>\nPor um aprendizado antigo.", accent:false},
+      {text:"De que ocupar espaço demais afasta.\nDe que suas necessidades\nsão um fardo.\nDe que se você pedir —\nvai perder.", accent:false},
+      {text:"E então você foi se tornando menor.\nAté o ponto em que\nnão se reconhece mais\ndentro da relação.", accent:true}
+    ]},
+    {type:"mirror", intro:"Isso é familiar?", items:[
+      "Você adapta seus gostos e opiniões ao que o outro parece querer",
+      "Suas necessidades parecem um fardo — então você minimiza",
+      "Você diz sim quando quer dizer não, mais vezes do que gostaria",
+      "Dentro das relações, você vai se tornando menor — e um dia não se reconhece mais"
+    ]},
+    {type:"sabotador", nome:"O Complacente", desc:"Ele acredita que amor exige adaptação total. Que suas necessidades são demais. Que se você pedir, vai perder. Ele diz sim quando quer dizer não. Ele diminui quando quer crescer. <strong>Ele foi criado num ambiente onde ser muito era arriscado</strong> — e agora carrega essa crença para dentro de todo vínculo que você cria."},
+    {type:"verdade", label:"O que essa couraça esconde", text:"Você não é pequena.\nVocê se tornou pequena\n<em>para sobrar.</em>", sub:"Em algum momento aprendeu que ocupar espaço demais afasta. Então você foi diminuindo. Mas quem te ama de verdade não precisa que você caiba num espaço menor. Ele tem espaço pra você inteira."},
+    {type:"verdade", label:"O que está esperando voltar", text:"Em algum lugar dentro de você\nainda existe uma mulher que quer\n<em>tomar espaço.</em>", sub:"Que quer ter opinião, ter voz, ter presença. Que quer ocupar uma relação de verdade — não as bordas dela. Essa mulher não foi embora. Ela só aprendeu a ficar quieta. E quieta não é o mesmo que morta."},
+    {type:"pergunta", pre:"Sente essa entrar.", question:"O que você deixou de ser — ou de dizer —\npara não ocupar espaço demais?\nO que você precisaria que fosse diferente\ne nunca pediu?", note:"Aqui é seguro. Só você."},
+    {type:"pratica", intro:"Uma prática de presença.", steps:[
+      "Identifique uma necessidade afetiva que você tem agora — e que ainda não disse a ninguém.",
+      "Nomeie ela internamente com clareza: <em>'Eu preciso de...'</em>",
+      "Não precisa pedir hoje. Só reconheça — sem minimizar, sem justificar.",
+      "Sinta o que é ter essa necessidade reconhecida — mesmo que só por você."
+    ]},
+    {type:"afirmacao", text:"Minhas necessidades\nnão são um fardo.\nOcupar espaço não afasta\namor de verdade —\nele chama.", sub:"Uma vez por dia."},
+    {type:"complete", icon:"🌺", badge:"Dia 6 concluído", title:"Couraça do Autoabandono — atravessada.", text:"Você não precisa se tornar menor para ser amada. Quem te ama de verdade tem espaço para você inteira."}
+  ]},
+
+  // DIA 7 — INDISPONIBILIDADE SILENCIOSA
+  {label:"Indisponibilidade Silenciosa", screens:[
+    {type:"cover", day:"Dia 7", title:"A Couraça da\n<em>Indisponibilidade\nSilenciosa</em>", hook:"A mais difundida. A mais silenciosa. A última.", breathe:"Respire fundo. Você chegou até aqui."},
+    {type:"reveal", blocks:[
+      {text:"Essa é a couraça\nque parece invisível.", accent:false},
+      {text:"Porque você não foge.\nNão termina.\nNão explode.", accent:false},
+      {text:"Você simplesmente\n<em>desliga.</em>", accent:false},
+      {text:"Fica na relação.\nMas a parte mais sua —\na que sente, a que quer, a que espera —\nfica guardada.\nProtegida.\n<strong>Disponível pra você.\nMas não pra mais ninguém.</strong>", accent:false},
+      {text:"Com o tempo,\nvocê esquece como se sentir\ncompletamente presente\ndentro de um vínculo.", accent:true}
+    ]},
+    {type:"mirror", intro:"Isso ressoa em você?", items:[
+      "Você está na relação — mas a parte mais sua ficou guardada",
+      "Você não fugiu. Não terminou. Só desligou por dentro.",
+      "Com o tempo, você esqueceu como se sentir completamente presente num vínculo",
+      "Você confunde proteção emocional com independência — e solidão com paz"
+    ]},
+    {type:"sabotador", nome:"O Ausente Presente", desc:"Ele aprendeu que estar lá sem estar de fato é a forma mais segura de existir num relacionamento. Você não se machuca porque não está de verdade. Não perde porque nunca deu de verdade. <strong>Ele é especialista em criar aparência de conexão sem a substância dela.</strong> E às vezes te convence de que isso é suficiente. Mas você sabe que não é."},
+    {type:"verdade", label:"O que essa couraça esconde", text:"Você não se fechou porque quis.\nVocê se fechou\n<em>para sobreviver.</em>", sub:"Em algum momento, estar presente demais custou caro. Então você encontrou uma forma de estar — sem estar de verdade. Mas sobreviver e viver não são a mesma coisa. E você sabe disso."},
+    {type:"pergunta", pre:"Esta é a pergunta mais importante das 7.\nFique com ela o tempo que precisar.", question:"Qual foi o momento em que você desligou\npor dentro dentro de uma relação?\nO que aconteceu antes?\nE o que você perdeu\nficando do lado de fora de si mesma?", note:"Não precisa de resposta. Só presença."},
+    {type:"pratica", intro:"A prática mais simples — e a mais profunda.", steps:[
+      "Sente-se. Coloque a mão no peito.",
+      "Pergunte: <em>o que eu estou sentindo agora — de verdade?</em> Não o que devo sentir. O que estou.",
+      "Fique com essa resposta por 5 minutos. Sem resolver, sem analisar.",
+      "Complete internamente: <em>'Hoje eu estou...'</em> — com honestidade total."
+    ]},
+    {type:"escolha", intro:"Quando as couraças caem, você volta a ter o que mais importa:", items:[
+      {tipo:"a", texto:"Você pode se conectar com alguém — por escolha, não por ansiedade"},
+      {tipo:"a", texto:"Você pode criar intimidade sem perder a si mesma no processo"},
+      {tipo:"a", texto:"Você pode amar sem viver em estado de alerta"},
+      {tipo:"b", texto:"Ou pode ficar sozinha — mas em paz, inteira, por escolha"},
+      {tipo:"b", texto:"Não porque o medo não deixou outra opção"}
+    ], closing:"Porque existe diferença entre escolher ficar sozinha\ne não conseguir mais deixar alguém entrar na sua vida.\nUma é liberdade.\nA outra é proteção emocional disfarçada de força."},
+    {type:"verdade", label:"O que está do outro lado", text:"Sobreviver emocionalmente\nnão é o mesmo que viver.", sub:"Você passou tempo suficiente aprendendo a não sentir demais. A não querer demais. A não ocupar demais. A não precisar demais. Esse tempo foi necessário. Mas ele pode ter acabado. Existe diferença entre uma mulher que sobrevive dentro das relações — e uma mulher que vive dentro delas. Que sente fome. Que tem desejo. Que quer ser tocada pela vida, não só protegida dela."},
+    {type:"verdade", label:"O que você pode querer de volta", text:"Não apenas amor.\n<em>Intensidade.</em>\nPresença.\nO desejo de sentir\na vida inteira dentro de você.", sub:"Não a vida gerenciada. Não a vida segura demais para doer. A vida com textura. Com risco emocional real. Com a possibilidade de ser surpreendida — por alguém, por si mesma, por um momento que você não controlou. Você não veio até aqui para continuar sobrevivendo. Você veio para decidir se quer voltar a sentir."},
+    {type:"afirmacao", text:"Eu posso estar presente de verdade.\nEstar aqui — inteira, sentindo —\nnão é perigo.\nÉ a vida que eu vim viver.", sub:"Leve para sempre."},
+    {type:"complete", icon:"✦", badge:"Dia 7 concluído", title:"Couraça da Indisponibilidade Silenciosa — atravessada.", text:"Todas as 7 couraças foram olhadas. Você não desviou o olhar de nenhuma delas. Isso já é outro lugar."}
+  ]}
+];
+
+let dayIdx=0, screenIdx=0, completedDays=[];
+
+function startApp(){
+  document.getElementById('splash').style.display='none';
+  document.getElementById('app').style.display='block';
+  render();
+}
+
+function render(){
+  const wrap=document.getElementById('screens-wrap');
+  wrap.innerHTML='';
+  const d=days[dayIdx], s=d.screens[screenIdx];
+  const div=document.createElement('div');
+  div.className='screen show';
+
+  if(s.type==='cover'){
+    const t=s.title.split('\n').join('<br>');
+    div.classList.add('scr-cover');
+    div.innerHTML=`<div class="c-day">${s.day} · ${d.label}</div><div class="c-title">${t}</div><div class="c-hook">${s.hook}</div><div class="c-breathe">${s.breathe}</div>`;
+  }
+  else if(s.type==='reveal'){
+    div.classList.add('scr-reveal');
+    const blocks=s.blocks.map(b=>{
+      const t=b.text.replace(/\n/g,'<br>');
+      return `<div class="rv-block${b.accent?' accent':''}"><div class="rb-text">${t}</div></div>`;
+    }).join('');
+    div.innerHTML=`<div class="rv-blocks">${blocks}</div>`;
+    setTimeout(()=>{div.querySelectorAll('.rv-block').forEach((el,i)=>setTimeout(()=>el.classList.add('on'),i*220));},80);
+  }
+  else if(s.type==='mirror'){
+    div.classList.add('scr-mirror');
+    const items=s.items.map(i=>`<div class="m-item">${i}</div>`).join('');
+    div.innerHTML=`<div class="m-intro">${s.intro}</div><div class="m-list">${items}</div>`;
+    setTimeout(()=>{div.querySelectorAll('.m-item').forEach((el,i)=>setTimeout(()=>el.classList.add('on'),i*180));},80);
+  }
+  else if(s.type==='sabotador'){
+    div.classList.add('scr-sab');
+    div.innerHTML=`<div class="sab-card"><div class="sab-eye">Sabotador interno</div><div class="sab-name">${s.nome}</div><div class="sab-desc">${s.desc}</div></div>`;
+  }
+  else if(s.type==='verdade'){
+    div.classList.add('scr-verdade');
+    const t=s.text.replace(/\n/g,'<br>');
+    div.innerHTML=`<div class="v-card"><div class="v-label">${s.label}</div><div class="v-text">${t}</div><div class="v-sub">${s.sub}</div></div>`;
+  }
+  else if(s.type==='pergunta'){
+    div.classList.add('scr-q');
+    const q=s.question.replace(/\n/g,'<br>');
+    div.innerHTML=`<div class="q-pre">${s.pre}</div><div class="q-box"><div class="q-text">${q}</div><div class="q-note">${s.note}</div></div><div class="breath-wrap"><div class="breath-label">Respire com isso</div><div class="breath-anim"><span></span></div></div>`;
+  }
+  else if(s.type==='pratica'){
+    div.classList.add('scr-pratica');
+    const steps=s.steps.map((p,i)=>`<div class="p-step"><div class="pn">${i+1}</div><div class="pt">${p}</div></div>`).join('');
+    div.innerHTML=`<div class="p-intro">${s.intro}</div><div class="p-steps">${steps}</div>`;
+    setTimeout(()=>{div.querySelectorAll('.p-step').forEach((el,i)=>setTimeout(()=>el.classList.add('on'),i*220));},80);
+  }
+  else if(s.type==='escolha'){
+    div.classList.add('scr-escolha');
+    const items=s.items.map(it=>`<div class="esc-card ${it.tipo}">${it.texto}</div>`).join('');
+    const cl=s.closing.replace(/\n/g,'<br>');
+    div.innerHTML=`<div class="esc-intro">${s.intro}</div><div class="esc-grid">${items}</div><div class="esc-closing">${cl}</div>`;
+  }
+  else if(s.type==='afirmacao'){
+    div.classList.add('scr-afirm');
+    const t=s.text.replace(/\n/g,'<br>');
+    div.innerHTML=`<div class="af-label">Frase para carregar</div><div class="af-card"><div class="af-text">${t}</div></div><div class="af-sub">${s.sub}</div>`;
+  }
+  else if(s.type==='complete'){
+    div.classList.add('scr-complete');
+    div.innerHTML=`<div class="cp-icon">${s.icon}</div><div class="cp-badge">${s.badge}</div><div class="cp-title">${s.title}</div><div class="cp-text">${s.text}</div>`;
+    if(!completedDays.includes(dayIdx)) completedDays.push(dayIdx);
+  }
+
+  wrap.appendChild(div);
+  window.scrollTo({top:0,behavior:'smooth'});
+  updateTopBar();
+  updateBottomNav();
+}
+
+function updateTopBar(){
+  const pips=document.getElementById('tb-pips');
+  pips.innerHTML='';
+  days.forEach((_,i)=>{
+    const p=document.createElement('div');
+    p.className='tb-pip'+(i===dayIdx?' active':'')+(completedDays.includes(i)&&i!==dayIdx?' done':'');
+    p.textContent=i+1;
+    pips.appendChild(p);
+  });
+  document.getElementById('tb-label').textContent=`Dia ${dayIdx+1} · ${days[dayIdx].label}`;
+}
+
+function updateBottomNav(){
+  const d=days[dayIdx];
+  const isFirst=dayIdx===0&&screenIdx===0;
+  const isLastScreen=screenIdx===d.screens.length-1;
+  const isLastDay=dayIdx===days.length-1;
+  document.getElementById('btn-bk').disabled=isFirst;
+  document.getElementById('nav-frac').textContent=`${screenIdx+1} / ${d.screens.length}`;
+  const fw=document.getElementById('btn-fw');
+  if(isLastScreen&&isLastDay) fw.textContent='Concluir travessia →';
+  else if(isLastScreen) fw.textContent=`Dia ${dayIdx+2} →`;
+  else fw.textContent='Continuar →';
+}
+
+function goForward(){
+  const d=days[dayIdx];
+  if(screenIdx<d.screens.length-1){screenIdx++;render();}
+  else if(dayIdx<days.length-1){dayIdx++;screenIdx=0;render();}
+  else{document.getElementById('app').style.display='none';document.getElementById('final').style.display='block';window.scrollTo({top:0,behavior:'smooth'});}
+}
+function goBack(){
+  if(screenIdx>0){screenIdx--;render();}
+  else if(dayIdx>0){dayIdx--;screenIdx=days[dayIdx].screens.length-1;render();}
+}
+</script>
+</body>
+</html>
